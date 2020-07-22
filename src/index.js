@@ -2,11 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import MP3Upload from './Music';
+import Footer from './component/Footer';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
   <React.StrictMode>
     <MP3Upload />
+    <Footer/>
   </React.StrictMode>,
   document.getElementById('root')
 );
