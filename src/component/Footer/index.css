@@ -50,6 +50,7 @@
 #bottom_layer img {
     height: 14px;
     width: 14px;
-    margin-bottom: -2px;
-    margin-right: 1px;
+    margin-bottom: 3px;
+    margin-right: 2px;
+    vertical-align: middle;
 }
