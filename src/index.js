@@ -1,13 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { BrowserRouter, Route } from 'react-router-dom';
 import './index.css';
-import MP3Upload from './Music';
+import Music from './Music';
 import Footer from './component/Footer';
 import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
   <React.StrictMode>
-    <MP3Upload />
+    <BrowserRouter>
+      <Route path='/' exact component={Music} />
+      <Route path='/music' exact component={Music} />
+    </BrowserRouter>
     <Footer/>
   </React.StrictMode>,
   document.getElementById('root')
