@@ -1,17 +1,42 @@
 import React, { PureComponent } from 'react';
 import './index.css';
+import { createWS } from 'utils/ws';
 
 class Game extends PureComponent {
 
   state = {
     step: 0,
     checkerboard: [],
-    gameOver: false,
+    // 0:连接断开 1:正在连接 2:游戏准备中 3:游戏开始 4:游戏结束
+    gameStatus: 1,
     planes: [],
+    showAllPlanesVisible: false,
   }
 
   componentDidMount() {
     this.startNewGame();
+  }
+
+  connectServer = () => {
+    this.setState({
+      gameStatus: 1,
+    }, () => {
+      const ws = createWS('/ws/plane/single/1/guest');
+      this.ws = ws;
+      ws.onopen = () => {
+        this.sendPlacePlaneCommand();
+      }
+      ws.onmessage = evt => {
+        this.onMessage(evt.data);
+      }
+      ws.onclose = () => {
+        this.ws = null;
+        this.setState({
+          gameStatus: 0,
+        })
+        alert("连接已断开");
+      }
+    })
   }
 
   initCheckerboard = () => {
@@ -26,9 +51,10 @@ class Game extends PureComponent {
     }
     this.setState({
       step: 0,
-      gameOver: false,
+      gameStatus: 3,
       checkerboard,
       planes: [],
+      showAllPlanesVisible: false,
     })
   }
 
@@ -66,10 +92,10 @@ class Game extends PureComponent {
   }
 
   onGameOver = (command) => {
-    alert("GameOver")
     this.setState({
-      gameOver: true,
+      gameStatus: 4,
       planes: command.planes,
+      showAllPlanesVisible: true,
     })
   }
 
@@ -81,28 +107,16 @@ class Game extends PureComponent {
     }
   }
 
-  connectServer = () => {
-    const ws = new WebSocket(`ws:localhost:8080/plane/single/1/guest`);
-    ws.onopen = () => {
-      this.sendPlacePlaneCommand();
-    }
-    ws.onmessage = evt => {
-      this.onMessage(evt.data);
-    }
-    ws.onclose = () => {
-      this.ws = null;
-      alert("连接已断开");
-    }
-    this.ws = ws;
-  }
-
   sendPlacePlaneCommand = () => {
+    this.setState({
+      gameStatus: 2,
+    })
     this.ws.send(JSON.stringify({code: 3}));
   }
 
   sendBombPointCommand = (x, y) => {
-    const { gameOver } = this.state;
-    if (!gameOver) {
+    const { gameStatus } = this.state;
+    if (gameStatus === 3) {
       this.ws.send(JSON.stringify({code: 5, x, y}));
     }
   }
@@ -114,23 +128,9 @@ class Game extends PureComponent {
         <div key={`${row}-${col}`} className='cell cell-clickable' onClick={() => this.sendBombPointCommand(col, row)} />
       )
     }
-    if (type === 1) {
-      return (
-        <div key={`${row}-${col}`} className='cell' />
-      )
-    }
-    if (type === 2) {
-      return (
-        <div key={`${row}-${col}`} className='cell'>o</div>
-      )
-    }
-    if (type === 3) {
-      return (
-        <div key={`${row}-${col}`} className='cell'>x</div>
-      )
-    }
+    const view = ['', ' ', 'o', 'x'];
     return (
-      <div key={`${row}-${col}`} className='cell'>?</div>
+      <div key={`${row}-${col}`} className='cell'>{view[type] || '?'}</div>
     )
   }
 
@@ -145,19 +145,35 @@ class Game extends PureComponent {
     })
     this.setState({
       checkerboard: [...checkerboard],
+      showAllPlanesVisible: false,
     })
+  }
+
+  getTitleView = () => {
+    const { step, gameStatus, showAllPlanesVisible } = this.state;
+    if (gameStatus === 0) {
+      return <span>连接失败，点击<span onClick={this.connectServer} className="text-clickable">重新连接</span></span>
+    }
+    if (gameStatus === 1) {
+      return <span style={{marginRight: 4}}>正在连接服务器...</span>
+    }
+    return (
+      <div>
+        <button style={{marginRight: 4}} onClick={this.startNewGame}>重新开始</button>
+        <span>{gameStatus === 4 ? "游戏结束，共" : "已"}用步数：{step}</span>
+        {showAllPlanesVisible && <button style={{marginLeft: 4}} onClick={this.showAllPoint}>显示所有飞机位置</button>}
+      </div>
+    )
   }
 
   render() {
 
-    const { checkerboard, step, gameOver } = this.state;
+    const { checkerboard } = this.state;
 
     return (
-      <div>
+      <div style={{ padding: 50 }}>
         <div style={{ marginBottom: 8 }}>
-          <button style={{ marginRight: 4 }} onClick={this.startNewGame}>重新开始</button>
-          <span>已用步数：{step}</span>
-          {gameOver && <button style={{marginLeft: 4}} onClick={this.showAllPoint}>显示所有飞机位置</button>}
+          {this.getTitleView()}
         </div>
         <div>
           {checkerboard.map((row, rowIndex) => (

@@ -4,7 +4,7 @@ function upload(setMusic) {
   const form = new FormData();
   const fileObj = document.getElementById("musicFile").files[0];
   form.append("file", fileObj);
-  fetch("music", {
+  fetch("api/music", {
     method: 'POST',
     body: form,
   })
@@ -20,7 +20,7 @@ function Music() {
   const [music, setMusic] = useState();
 
   return (
-    <div style={{padding: 50}}>
+    <div style={{ padding: 50 }}>
       <div>
         <input id="musicFile" type="file" accept="audio/*" onChange={() => upload(setMusic)} style={{width: "100%"}}/>
       </div>
