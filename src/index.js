@@ -10,7 +10,7 @@ import SingleGame from './pages/bombplane/single';
 import Hall from './pages/bombplane/multi/Hall';
 import Room from './pages/bombplane/multi/Room';
 import Game from './pages/bombplane/multi/Game';
-import {BrowserRouter, Route} from "react-router-dom";
+import { BrowserRouter, Route } from "react-router-dom";
 
 ReactDOM.render(
   <React.StrictMode>
