@@ -140,18 +140,22 @@ class Room extends PureComponent {
 
   sendPlacePlaneCommand = () => {
     const { send } = this.props;
-    // TODO
-    send({code: 4, planes: [
-      {x: 2, y: 0, direction: 3}, {x: 7, y: 0, direction: 3}, {x: 2, y: 4, direction: 3}
-      ]
-    });
+    send({code: 4, random: true});
   }
 
   sendBombPointCommand = (x, y) => {
     const { send } = this.props;
-    const { current } = this.state;
-    if (current === 1) {
+    const { current, status } = this.state;
+    if (current === 1 && status === 2) {
       send({code: 5, x, y});
+    }
+  }
+
+  showAllPlane = () => {
+    const { status } = this.state;
+    if (status === 3) {
+      this.checkerboard1.showAllPoint();
+      this.checkerboard2.showAllPoint();
     }
   }
 
@@ -166,8 +170,9 @@ class Room extends PureComponent {
     return (
       <div>
         <div>当前房间号：{roomId}</div>
-        {!playerPlacePlaneOver && status === 1 && <button onClick={this.sendPlacePlaneCommand}>放置飞机</button>}
+        {!playerPlacePlaneOver && status === 1 && <button onClick={this.sendPlacePlaneCommand}>随机放置飞机</button>}
         {status === 3 && <span>游戏结束，你{winner === playerId ? "赢" : "输"}了</span>}
+        {status === 3 && <button onClick={this.showAllPlane}>显示所有飞机位置</button>}
         {status === 2 && <span>{current === 1 ? "你的" : "对家"}回合</span>}
         <div>
           <div>
