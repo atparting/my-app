@@ -6,10 +6,8 @@ import Footer from "./component/Footer";
 import Home from './pages/home';
 import Music from './pages/Music';
 import BombPlane from './pages/bombplane';
-import SingleGame from './pages/bombplane/single';
-import Hall from './pages/bombplane/multi/Hall';
-import Room from './pages/bombplane/multi/Room';
-import Game from './pages/bombplane/multi/Game';
+import BombPlaneSingle from './pages/bombplane/single';
+import BombPlaneMulti from './pages/bombplane/multi';
 import { BrowserRouter, Route } from "react-router-dom";
 
 ReactDOM.render(
@@ -18,10 +16,8 @@ ReactDOM.render(
       <Route path='/' exact component={Home} />
       <Route path='/music' exact component={Music} />
       <Route path='/bombplane' exact component={BombPlane} />
-      <Route path='/bombplane/single' exact component={SingleGame} />
-      <Route path='/bombplane/multi/hall' exact component={Hall} />
-      <Route path='/bombplane/multi/room' exact component={Room} />
-      <Route path='/bombplane/multi/game' exact component={Game} />
+      <Route path='/bombplane/single' exact component={BombPlaneSingle} />
+      <Route path='/bombplane/multi' exact component={BombPlaneMulti} />
     </BrowserRouter>
     <Footer/>
   </React.StrictMode>,

@@ -1,12 +1,12 @@
 import React, { PureComponent } from 'react';
-import './index.css';
+import '../index.css';
 import { createWS } from 'utils/ws';
+import Checkerboard from "../Checkerboard";
 
-class Game extends PureComponent {
+class BombPlaneSingle extends PureComponent {
 
   state = {
     step: 0,
-    checkerboard: [],
     // 0:连接断开 1:正在连接 2:游戏准备中 3:游戏开始 4:游戏结束
     gameStatus: 1,
     planes: [],
@@ -39,23 +39,14 @@ class Game extends PureComponent {
     })
   }
 
-  initCheckerboard = () => {
-    const checkerboard = [];
-    for (let i = 0; i < 10; i++) {
-      const row = [];
-      for (let j = 0; j < 10; j++) {
-        // 0:unknown 1:empty 2:body 3:head
-        row.push({type: 0})
-      }
-      checkerboard.push(row);
-    }
+  init = () => {
     this.setState({
       step: 0,
       gameStatus: 3,
-      checkerboard,
       planes: [],
       showAllPlanesVisible: false,
     })
+    this.checkerboard.init();
   }
 
   onMessage = (msg) => {
@@ -77,18 +68,16 @@ class Game extends PureComponent {
   }
 
   onPlacePlaneOver = (command) => {
-    this.initCheckerboard();
+    this.init();
   }
 
   onBombPoint = (command) => {
     const { x, y, type } = command;
-    const { checkerboard, step } = this.state;
-    const point = checkerboard[y][x];
-    point.type = type;
+    const { step } = this.state;
     this.setState({
       step: step + 1,
-      checkerboard,
     })
+    this.checkerboard.showPoint(y, x, type);
   }
 
   onGameOver = (command) => {
@@ -121,32 +110,11 @@ class Game extends PureComponent {
     }
   }
 
-  renderCell = (cell, row, col) => {
-    const { type } = cell;
-    if (type === 0) {
-      return (
-        <div key={`${row}-${col}`} className='cell cell-clickable' onClick={() => this.sendBombPointCommand(col, row)} />
-      )
-    }
-    const view = ['', ' ', 'o', 'x'];
-    return (
-      <div key={`${row}-${col}`} className='cell'>{view[type] || '?'}</div>
-    )
-  }
-
   showAllPoint = () => {
-    const { checkerboard, planes } = this.state;
-    planes.forEach(plane => {
-      const { allPoint } = plane;
-      for (let i = 0; i < allPoint.length; i++) {
-        const { x, y } = allPoint[i];
-        checkerboard[y][x].type = i === 0 ? 3 : 2;
-      }
-    })
     this.setState({
-      checkerboard: [...checkerboard],
       showAllPlanesVisible: false,
     })
+    this.checkerboard.showAllPoint();
   }
 
   getTitleView = () => {
@@ -168,23 +136,20 @@ class Game extends PureComponent {
 
   render() {
 
-    const { checkerboard } = this.state;
-
+    const { planes } = this.state;
     return (
       <div style={{ padding: 50 }}>
         <div style={{ marginBottom: 8 }}>
           {this.getTitleView()}
         </div>
-        <div>
-          {checkerboard.map((row, rowIndex) => (
-            <div key={`row-${rowIndex}`}>
-              {row.map((cell, index) => this.renderCell(cell, rowIndex, index))}
-            </div>
-          ))}
-        </div>
+        <Checkerboard
+          onRef={ref => {this.checkerboard = ref}}
+          planes={planes}
+          onClickCell={(row, col) => this.sendBombPointCommand(col, row)}
+        />
       </div>
     )
   }
 }
 
-export default Game;
+export default BombPlaneSingle;

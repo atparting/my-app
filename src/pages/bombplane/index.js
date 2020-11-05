@@ -8,7 +8,7 @@ function BombPlane() {
         <Link to='/bombplane/single'>单人模式</Link>
       </li>
       <li>
-        <Link to='/bombplane/multi/hall'>多人模式</Link>
+        <Link to='/bombplane/multi'>多人模式</Link>
       </li>
     </ul>
   );

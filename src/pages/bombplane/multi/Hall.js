@@ -1,80 +1,77 @@
 import React, { PureComponent } from 'react';
-import { createWS } from "../../../utils/ws";
+import "../index.css";
 
 class Hall extends PureComponent {
 
   state = {
-    userId: '',
-    userName: '',
     rooms: [],
+    // 0:获取房间列表中 1:获取房间列表成功
+    status: 0,
   }
 
   componentDidMount() {
-
-  }
-
-  connectServer = () => {
-    const { userId, userName } = this.state;
-    const ws = createWS(`/ws/plane/multi/${userId}/${userName}`);
-    this.ws = ws;
-    ws.onopen = () => {
-      this.sendGetRoomCommand();
-    }
-    ws.onmessage = evt => {
-      this.onMessage(evt.data);
-    }
-    ws.onclose = () => {
-      this.ws = null;
-      alert("连接已断开");
-    }
+    const { onRef } = this.props;
+    onRef(this);
+    this.sendGetRoomCommand();
   }
 
   onMessage = (msg) => {
     const command = JSON.parse(msg);
     const { code } = command;
-    if (code === 0) {
-      this.onError(command);
-    } else if (code === 1) {
+    if (code === 1) {
       this.onGetRoom(command);
+    } else if (code === 2) {
+      this.onJoinRoom(command);
     }
-  }
-
-  onError = (command) => {
-    alert(command.message)
   }
 
   onGetRoom = (command) => {
     this.setState({
       rooms: command.rooms,
+      status: 1,
     })
   }
 
+  onJoinRoom = (command) => {
+    const { gotoRoom } = this.props;
+    const { roomId, player } = command;
+    gotoRoom(roomId, player);
+  }
+
   sendGetRoomCommand = () => {
-    this.ws.send(JSON.stringify({code: 1}));
+    const { send } = this.props;
+    this.setState({
+      status: 0,
+    })
+    send({code: 1});
+  }
+
+  sendJoinRoomCommand = roomId => {
+    const { send } = this.props;
+    send({code: 2, roomId});
   }
 
   render() {
-
-    const { rooms, userId, userName } = this.state;
-    const { history } = this.props;
+    const { rooms, status } = this.state;
 
     return (
       <div>
-        <button onClick={() => history.push('/')}>返回首页</button>
-        <span>id</span>
-        <input onChange={e => this.setState({ id: e.target.value })} value={userId} />
-        <span>userName</span>
-        <input onChange={e => this.setState({ id: e.target.value })} value={userName} />
-        <button onClick={this.connectServer}>连接</button>
-        <ul>
-          {rooms.map(room => (
-            <li>
-              <span>{`id: ${room.id}`}</span>
-              <button>进入</button>
-            </li>
+        {status === 0 ? <span style={{marginLeft: 8}}>获取房间列表中...</span> : <ul>
+          {rooms.map(room => {
+            const { id, players } = room;
+            return (
+              <li key={id}>
+                <span>{`id: ${id}`}</span>
+                <span style={{ marginLeft: 4, marginRight: 4 }}>房间内玩家：</span>
+                {players && players.map(player => (
+                  player ? <span style={{ marginRight: 4 }}>{player.name}</span> : null
+                ))}
+                <button onClick={() => this.sendJoinRoomCommand(id)}>进入</button>
+              </li>
             )
+            }
           )}
-        </ul>
+        </ul>}
       </div>
     )
   }
