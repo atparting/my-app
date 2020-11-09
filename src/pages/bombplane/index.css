@@ -25,3 +25,13 @@
     cursor: pointer;
     text-decoration: underline;
 }
+
+.rule {
+    padding: 20px;
+    position: absolute;
+    left: 10px;
+    top: 20px;
+    border: 1px solid #00BCD4;
+    border-radius: 10px;
+    background: #efefef;
+}

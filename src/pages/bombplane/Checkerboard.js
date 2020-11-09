@@ -32,7 +32,7 @@ export default class Checkerboard extends PureComponent {
 
   renderCell = (cell, row, col) => {
     const { onClickCell } = this.props;
-    const { type } = cell;
+    const { type, attacked, color } = cell;
     if (type === 0) {
       return (
         <div
@@ -48,18 +48,27 @@ export default class Checkerboard extends PureComponent {
     }
     const view = ['', ' ', 'o', 'x'];
     return (
-      <div key={`${row}-${col}`} className='checkerboard-cell'>{view[type] || '?'}</div>
+      <div
+        key={`${row}-${col}`}
+        className={attacked ? 'checkerboard-cell' : 'checkerboard-cell-clickable'}
+        style={{ color: color || "" }}
+      >
+        {view[type] || '?'}
+      </div>
     )
   }
 
   showAllPoint = () => {
     const { checkerboard } = this.state;
     const { planes } = this.props;
-    planes.forEach(plane => {
+    const colors = ['red', 'green', 'blue'];
+    planes.forEach((plane, index) => {
       const { allPoint } = plane;
       for (let i = 0; i < allPoint.length; i++) {
         const { x, y } = allPoint[i];
-        checkerboard[y][x].type = i === 0 ? 3 : 2;
+        const point = checkerboard[y][x];
+        point.type = i === 0 ? 3 : 2;
+        point.color = colors[index];
       }
     })
     this.setState({
@@ -69,7 +78,9 @@ export default class Checkerboard extends PureComponent {
 
   showPoint = (row, col, type) => {
     const { checkerboard } = this.state;
-    checkerboard[row][col].type = type;
+    const point = checkerboard[row][col];
+    point.type = type;
+    point.attacked = true;
     this.setState({
       checkerboard: [...checkerboard],
     })

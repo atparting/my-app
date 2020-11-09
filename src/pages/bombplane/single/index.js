@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import '../index.css';
 import { createWS } from 'utils/ws';
 import Checkerboard from "../Checkerboard";
+import Rule from "../Rule";
 
 class BombPlaneSingle extends PureComponent {
 
@@ -11,6 +12,7 @@ class BombPlaneSingle extends PureComponent {
     gameStatus: 1,
     planes: [],
     showAllPlanesVisible: false,
+    showRule: false,
   }
 
   componentDidMount() {
@@ -117,6 +119,12 @@ class BombPlaneSingle extends PureComponent {
     this.checkerboard.showAllPoint();
   }
 
+  showGameRule = () => {
+    this.setState({
+      showRule: true,
+    })
+  }
+
   getTitleView = () => {
     const { step, gameStatus, showAllPlanesVisible } = this.state;
     if (gameStatus === 0) {
@@ -127,6 +135,7 @@ class BombPlaneSingle extends PureComponent {
     }
     return (
       <div>
+        <button style={{marginRight: 4}} onClick={this.showGameRule}>游戏规则</button>
         <button style={{marginRight: 4}} onClick={this.startNewGame}>重新开始</button>
         <span>{gameStatus === 4 ? "游戏结束，共" : "已"}用步数：{step}</span>
         {showAllPlanesVisible && <button style={{marginLeft: 4}} onClick={this.showAllPoint}>显示所有飞机位置</button>}
@@ -136,7 +145,8 @@ class BombPlaneSingle extends PureComponent {
 
   render() {
 
-    const { planes } = this.state;
+    const { planes, showRule } = this.state;
+
     return (
       <div style={{ padding: 50 }}>
         <div style={{ marginBottom: 8 }}>
@@ -147,6 +157,7 @@ class BombPlaneSingle extends PureComponent {
           planes={planes}
           onClickCell={(row, col) => this.sendBombPointCommand(col, row)}
         />
+        {showRule && <Rule onClose={() => this.setState({showRule: false})} />}
       </div>
     )
   }

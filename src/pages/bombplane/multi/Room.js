@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import Checkerboard from "../Checkerboard";
+import Rule from "../Rule";
 
 class Room extends PureComponent {
 
@@ -15,6 +16,7 @@ class Room extends PureComponent {
     // 0没轮到任何人 1轮到你 2轮到对手
     current: 0,
     winner: 0,
+    showRule: false,
   }
 
   componentDidMount() {
@@ -89,6 +91,7 @@ class Room extends PureComponent {
         playerPlacePlaneOver: true,
         playerPlanes: planes,
       })
+      this.checkerboard1.showAllPoint();
     } else {
       this.setState({
         opponentPlacePlaneOver: true,
@@ -162,14 +165,14 @@ class Room extends PureComponent {
   render() {
 
     const { roomId, player: { id: playerId, name: playerName } } = this.props;
-    const { status, ready, current, playerPlanes, opponentPlanes, playerPlacePlaneOver, winner,
+    const { status, ready, current, playerPlanes, opponentPlanes, playerPlacePlaneOver, winner, showRule,
       opponent: { id: opponentId, name: opponentName, ready: opponentReady}
     } = this.state;
     const notStart = status === 0 || status === 3;
 
     return (
       <div>
-        <div>当前房间号：{roomId}</div>
+        <div>当前房间号：{roomId} <button onClick={() => this.setState({showRule: true})}>游戏规则</button></div>
         {!playerPlacePlaneOver && status === 1 && <button onClick={this.sendPlacePlaneCommand}>随机放置飞机</button>}
         {status === 3 && <span>游戏结束，你{winner === playerId ? "赢" : "输"}了</span>}
         {status === 3 && <button onClick={this.showAllPlane}>显示所有飞机位置</button>}
@@ -197,6 +200,7 @@ class Room extends PureComponent {
             planes={opponentPlanes}
           />
         </div>
+        {showRule && <Rule onClose={() => this.setState({showRule: false})}/>}
       </div>
     )
   }
