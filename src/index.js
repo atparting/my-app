@@ -8,6 +8,7 @@ import Music from './pages/Music';
 import BombPlane from './pages/bombplane';
 import BombPlaneSingle from './pages/bombplane/single';
 import BombPlaneMulti from './pages/bombplane/multi';
+import MineClearance from './pages/mineclearance';
 import { BrowserRouter, Route } from "react-router-dom";
 
 ReactDOM.render(
@@ -18,6 +19,7 @@ ReactDOM.render(
       <Route path='/bombplane' exact component={BombPlane} />
       <Route path='/bombplane/single' exact component={BombPlaneSingle} />
       <Route path='/bombplane/multi' exact component={BombPlaneMulti} />
+      <Route path='/mineclearance' exact component={MineClearance} />
     </BrowserRouter>
     <Footer/>
   </React.StrictMode>,
