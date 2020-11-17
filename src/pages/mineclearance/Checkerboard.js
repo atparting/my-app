@@ -33,37 +33,39 @@ export default class Checkerboard extends PureComponent {
   getCellContent = cell => {
     const { mine, mineNum, status } = cell;
     if (mine) {
-      return '*';
+      return '💣';
     }
     if (status === 3) {
-      return mineNum || '';
+      const color = ['#2196f3', '#8bc34a', '#f44336', '#3f51b5',
+        '#795548', '#00bcd4', '#607d8b', '#9e9e9e'];
+      return mineNum ? <span style={{ color: color[mineNum - 1] }}>{mineNum}</span> : '';
     }
-    const view = ['', '1', '?'];
+    const view = ['', '🚩', '❓'];
     return view[status];
   }
 
   renderCell = (cell, row, col) => {
     const { onClickCell } = this.props;
-    const { show, mine, mineNum, status } = cell;
-    if (status !== 3) {
-      return (
-        <div
-          key={`${row}-${col}`}
-          className='checkerboard-cell-clickable'
-          onClick={() => {
-            if (onClickCell) {
-              onClickCell(row, col);
-            }
-          }}
-        >
-          {this.getCellContent(cell)}
-        </div>
-      )
-    }
+    const { status } = cell;
     return (
       <div
         key={`${row}-${col}`}
-        className={show ? 'checkerboard-cell' : 'checkerboard-cell-clickable'}
+        className={status === 3 ? 'checkerboard-cell' : 'checkerboard-cell-clickable'}
+        onMouseDown={e => {
+          e.preventDefault();
+          if (status === 3) {
+            if (e.button === 1) {
+              onClickCell(row, col, e.button);
+            }
+          } else {
+            if (e.button === 0 || e.button === 2) {
+              onClickCell(row, col, e.button);
+            }
+          }
+        }}
+        onContextMenu={e => {
+          e.preventDefault();
+        }}
       >
         {this.getCellContent(cell)}
       </div>
@@ -80,7 +82,6 @@ export default class Checkerboard extends PureComponent {
       } else {
         checkerPoint.mineNum = mineNum;
       }
-      checkerPoint.show = true;
       checkerPoint.status = 3;
     })
     this.setState({
@@ -100,13 +101,26 @@ export default class Checkerboard extends PureComponent {
     })
   }
 
+  changePointStatus = (row, col, status) => {
+    const { checkerboard } = this.state;
+    const checkerPoint = checkerboard[row][col];
+    checkerPoint.status = status;
+    this.setState({
+      checkerboard: [...checkerboard],
+    })
+  }
+
   render() {
 
     const { style, className, id } = this.props;
     const { checkerboard } = this.state;
 
     return (
-      <div id={id || ""} className={`${className || ""} checkerboard`} style={style || {}}>
+      <div
+        id={id || ""}
+        className={`${className || ""} checkerboard`}
+        style={style || {}}
+      >
         {checkerboard.map((row, rowIndex) => (
           <div key={`row-${rowIndex}`}>
             {row.map((cell, index) => this.renderCell(cell, rowIndex, index))}

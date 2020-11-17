@@ -43,6 +43,8 @@ class MineClearance extends PureComponent {
     this.setState({
       step: 0,
       gameStatus: 3,
+      win: false,
+      mines: [],
     })
     this.checkerboard.init();
   }
@@ -81,7 +83,8 @@ class MineClearance extends PureComponent {
   }
 
   onChangePointFlag = command => {
-
+    const { x, y, flag } = command;
+    this.checkerboard.changePointStatus(y, x, flag);
   }
 
   onGameOver = (command) => {
@@ -110,10 +113,10 @@ class MineClearance extends PureComponent {
     this.ws.send(JSON.stringify({code: 1}));
   }
 
-  sendClearanceCommand = (x, y) => {
-    const {gameStatus} = this.state;
+  sendClearanceCommand = (x, y, type) => {
+    const { gameStatus } = this.state;
     if (gameStatus === 3) {
-      this.ws.send(JSON.stringify({code: 2, x, y, type: 1}));
+      this.ws.send(JSON.stringify({code: 2, x, y, type}));
     }
   }
 
@@ -145,7 +148,7 @@ class MineClearance extends PureComponent {
           onRef={ref => {
             this.checkerboard = ref
           }}
-          onClickCell={(row, col) => this.sendClearanceCommand(col, row)}
+          onClickCell={(row, col, button) => this.sendClearanceCommand(col, row, button)}
         />
       </div>
     )
