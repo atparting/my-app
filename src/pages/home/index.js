@@ -19,7 +19,10 @@ function Index() {
             <Link to='/bombplane'>炸飞机</Link>
           </li>
           <li>
-            <Link to='/mineclearance'>扫雷</Link>
+            <Link to='/minesweeper'>扫雷</Link>
+          </li>
+          <li>
+            <Link to='/snake'>贪吃蛇</Link>
           </li>
         </ul>
       </header>
