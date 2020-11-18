@@ -1,0 +1,18 @@
+.checkerboard {
+    display: inline-block;
+}
+
+.checkerboard-cell {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    border: 1px solid #61dafb;
+    text-align: center;
+    vertical-align: top;
+}
+
+.text-clickable {
+    color: #4a90e2;
+    cursor: pointer;
+    text-decoration: underline;
+}
